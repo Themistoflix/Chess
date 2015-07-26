@@ -3,6 +3,8 @@
 
 #include "Board.h"
 
+using namespace std;
+
 class ExtendedBoard{
 public:
 	ExtendedBoard();
@@ -11,9 +13,10 @@ public:
 
 public:
 	Board to8x8Board();
+	void setupStartPosition();
 
 public:
-	char field[10][12];
+	char field[120];
 	
 	int enPassantTargetSquare10x12;
 
@@ -23,7 +26,7 @@ public:
 	bool shortCastlingWAllowed;
 
 	bool longCastlingBAllowed;
-	bool longCastlingBAllowed;
+	bool shortCastlingBAllowed;
 };
 
 int mailboxTo120(int position8x8);

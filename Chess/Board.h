@@ -12,10 +12,10 @@ public:
 	~Board();
 
 	void actualize(Board other);
-	void reset();
+	void setupStartPosition();
 
 public:
-	char field[8][8]; 
+	char field[64]; 
 
 };
 #endif

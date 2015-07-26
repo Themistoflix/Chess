@@ -79,6 +79,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Board.cpp" />
+    <ClCompile Include="ExtendedBoard.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameResult.cpp" />
     <ClCompile Include="main.cpp" />
