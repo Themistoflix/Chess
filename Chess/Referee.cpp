@@ -5,14 +5,14 @@ Referee::Referee(){
 	boardLog.push_back(startBoard);
 }
 
-GameResult Referee::verfiyMove(string move){
+GameResult Referee::verifyMove(string move){
 	GameResult result;
 
 	return result;
 }
 
-Board Referee::actualizeBoard(){
-	return *(boardLog.end() - 1);
+Board Referee::returnActualizedBoard(){
+	return (boardLog.end() - 1)->to8x8Board();
 }
 
 void Referee::setTimeLimit(long newTimeLimit){

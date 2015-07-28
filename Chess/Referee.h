@@ -7,6 +7,7 @@
 
 #include "GameResult.h"
 #include "Board.h"
+#include "ExtendedBoard.h"
 
 using namespace std;
 
@@ -14,8 +15,8 @@ class Referee{
 public:
 	Referee();
 
-	GameResult verfiyMove(string move);
-	Board actualizeBoard();
+	GameResult verifyMove(string move);
+	Board returnActualizedBoard();
 
 	void reset();
 
@@ -37,6 +38,6 @@ private:
 
 	long timeLimit;
 
-	vector<Board> boardLog;
+	vector<ExtendedBoard> boardLog;
 };
 #endif

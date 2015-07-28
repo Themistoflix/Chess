@@ -29,17 +29,41 @@ int mailboxTo64(int position10x12){
 	return positions[position10x12];
 }
 
+ExtendedBoard::ExtendedBoard(){
+	setupStartPosition();
+}
+
+ExtendedBoard::ExtendedBoard(ExtendedBoard &other){
+	for (int i = 0; i < 120; i++){
+		field[i] = other.field[i];
+	}
+
+	enPassantTargetSquare10x12 = other.enPassantTargetSquare10x12;
+	
+	whitesMove = other.whitesMove;
+
+	longCastlingWAllowed = other.longCastlingWAllowed;
+	shortCastlingWAllowed = other.shortCastlingWAllowed;
+
+	longCastlingBAllowed = other.longCastlingBAllowed;
+	shortCastlingBAllowed = other.shortCastlingBAllowed;
+}
+
+ExtendedBoard::~ExtendedBoard(){
+
+}
+
 void ExtendedBoard::setupStartPosition(){
 	char c[120] =	{	'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x',
 						'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x',
-						'x', 't', 'h', 'b', 'q', 'k', 'b', 'h', 't', 'x',
-						'x', 'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p', 'x',
+						'x', 't', 's', 'l', 'd', 'k', 'l', 's', 't', 'x',
+						'x', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b', 'x',
 						'x', '.', '.', '.', '.', '.', '.', '.', '.', 'x',
 						'x', '.', '.', '.', '.', '.', '.', '.', '.', 'x',
 						'x', '.', '.', '.', '.', '.', '.', '.', '.', 'x',
 						'x', '.', '.', '.', '.', '.', '.', '.', '.', 'x',
-						'x', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'x',
-						'x', 'T', 'H', 'B', 'Q', 'K', 'B', 'H', 'T', 'x',
+						'x', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'x',
+						'x', 'T', 'S', 'L', 'D', 'K', 'L', 'S', 'T', 'x',
 						'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x',
 						'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'
 					};
@@ -48,7 +72,7 @@ void ExtendedBoard::setupStartPosition(){
 		field[i] = c[i];
 	}
 
-	enPassantTargetSquare10x12 = 0;
+	enPassantTargetSquare10x12 = -1;
 
 	whitesMove = true;
 

@@ -23,11 +23,11 @@ GameResult Game::run(){
 		referee->stopTimer();
 		referee->actualizeTimerWhite();
 
-		result = referee->verfiyMove(cmd);
+		result = referee->verifyMove(cmd);
 		if (result.gameHasEnded){
 			break;
 		}
-		board = referee->actualizeBoard();
+		board = referee->returnActualizedBoard();
 		playerB->submitNewBoard(board, cmd);
 
 		referee->startTimer();
@@ -35,11 +35,11 @@ GameResult Game::run(){
 		referee->stopTimer();
 		referee->actualizeTimerBlack();
 
-		result = referee->verfiyMove(cmd);
+		result = referee->verifyMove(cmd);
 		if (result.gameHasEnded){
 			break;
 		}
-		board = referee->actualizeBoard();
+		board = referee->returnActualizedBoard();
 		playerW->submitNewBoard(board, cmd);
 	}
 
