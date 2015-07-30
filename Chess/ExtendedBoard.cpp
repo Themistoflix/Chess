@@ -40,6 +40,9 @@ ExtendedBoard::ExtendedBoard(ExtendedBoard &other){
 
 	enPassantTargetSquare10x12 = other.enPassantTargetSquare10x12;
 	
+	kingWPosition10x12 = other.kingWPosition10x12;
+	kingBPosition10x12 = other.kingBPosition10x12;
+
 	whitesMove = other.whitesMove;
 
 	longCastlingWAllowed = other.longCastlingWAllowed;
@@ -76,6 +79,9 @@ void ExtendedBoard::setupStartPosition(){
 
 	whitesMove = true;
 
+	kingWPosition10x12 = 95;
+	kingBPosition10x12 = 25;
+
 	longCastlingWAllowed = true;
 	shortCastlingWAllowed = true;
 
@@ -92,4 +98,34 @@ Board ExtendedBoard::to8x8Board(){
 	}
 
 	return b;
+}
+
+void ExtendedBoard::makeMove(Move move){
+	for (int i = 0; i < 4; i++){
+		field[move.positionsAndDeltas[i * 2]] += move.positionsAndDeltas[i * 2 + 1];
+	}
+
+	kingWPosition10x12 += move.KingWPosition10x12Delta;
+	kingBPosition10x12 += move.KingBPosition10x12Delta;
+}
+
+void ExtendedBoard::updateCastlingRightsAfterMove(Move move){
+	longCastlingWAllowed = (longCastlingWAllowed && move.castlingNowForbidden[0]);
+	shortCastlingWAllowed = (shortCastlingWAllowed && move.castlingNowForbidden[1]);
+
+	longCastlingBAllowed = (longCastlingBAllowed && move.castlingNowForbidden[2]);
+	shortCastlingBAllowed = (shortCastlingBAllowed && move.castlingNowForbidden[3]);
+}
+
+void ExtendedBoard::unmakeMove(Move move){
+	for (int i = 0; i < 4; i++){
+		field[move.positionsAndDeltas[i * 2]] -= move.positionsAndDeltas[i * 2 + 1];
+	}
+
+	kingWPosition10x12 -= move.KingWPosition10x12Delta;
+	kingBPosition10x12 -= move.KingBPosition10x12Delta;
+}
+
+int ExtendedBoard::simpleMoveGenerator(){
+	return 0;
 }

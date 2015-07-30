@@ -1,11 +1,11 @@
 #include "Referee.h"
 
 Referee::Referee(){
-	Board startBoard;
+	ExtendedBoard startBoard;
 	boardLog.push_back(startBoard);
 }
 
-GameResult Referee::verifyMove(string move){
+GameResult Referee::verifyMove(MoveCommand cmd){
 	GameResult result;
 
 	return result;

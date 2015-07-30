@@ -2,12 +2,13 @@
 #define _REFEREE_H_
 
 #include <vector>
-#include <string>
 #include <ctime>
 
 #include "GameResult.h"
 #include "Board.h"
 #include "ExtendedBoard.h"
+#include "Move.h"
+#include "MoveCommand.h"
 
 using namespace std;
 
@@ -15,7 +16,7 @@ class Referee{
 public:
 	Referee();
 
-	GameResult verifyMove(string move);
+	GameResult verifyMove(MoveCommand cmd);
 	Board returnActualizedBoard();
 
 	void reset();

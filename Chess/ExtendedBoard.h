@@ -2,6 +2,7 @@
 #define EXTENDEDBOARD_H_
 
 #include "Board.h"
+#include "Move.h"
 
 using namespace std;
 
@@ -15,8 +16,17 @@ public:
 	Board to8x8Board();
 	void setupStartPosition();
 
+	void makeMove(Move move);
+	void updateCastlingRightsAfterMove(Move move);
+	void unmakeMove(Move move);
+
+	int simpleMoveGenerator();
+
 public:
 	char field[120];
+
+	int kingWPosition10x12;
+	int kingBPosition10x12;
 	
 	int enPassantTargetSquare10x12;
 

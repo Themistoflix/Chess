@@ -16,7 +16,7 @@ GameResult Game::run(){
 	result.nameBlack = playerB->getName();
 	result.nameWhite = playerW->getName();
 
-	string cmd;
+	MoveCommand cmd;
 	while (1){
 		referee->startTimer();
 		cmd = playerW->move();

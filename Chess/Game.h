@@ -1,12 +1,12 @@
 #ifndef _GAME_H_
 #define _GAME_H_
 
-#include <string>
-
+#include "AbstractPlayer.h"
 #include "Board.h"
 #include "GameResult.h"
+#include "MoveCommand.h"
 #include "Referee.h"
-#include "AbstractPlayer.h"
+
 
 using namespace std;
 

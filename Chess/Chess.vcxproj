@@ -83,6 +83,8 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameResult.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Move.cpp" />
+    <ClCompile Include="MoveCommand.cpp" />
     <ClCompile Include="Referee.cpp" />
     <ClCompile Include="Tournament.cpp" />
   </ItemGroup>
@@ -92,6 +94,8 @@
     <ClInclude Include="ExtendedBoard.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameResult.h" />
+    <ClInclude Include="Move.h" />
+    <ClInclude Include="MoveCommand.h" />
     <ClInclude Include="Referee.h" />
     <ClInclude Include="Tournament.h" />
   </ItemGroup>
