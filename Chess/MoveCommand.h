@@ -3,6 +3,7 @@
 
 struct MoveCommand{
 	MoveCommand();
+	MoveCommand(int from, int to, char promo);
 
 	int fromPosition8x8;
 	int toPosition8x8;

@@ -1,8 +1,11 @@
 #ifndef EXTENDEDBOARD_H_
 #define EXTENDEDBOARD_H_
 
+#include <vector>
+
 #include "Board.h"
 #include "Move.h"
+#include "MoveCommand.h"
 
 using namespace std;
 
@@ -17,10 +20,16 @@ public:
 	void setupStartPosition();
 
 	void makeMove(Move move);
-	void updateCastlingRightsAfterMove(Move move);
 	void unmakeMove(Move move);
 
-	int simpleMoveGenerator();
+	void updateCastlingRightsAfterMove(Move move);
+	void updateMoveRight();
+	void updateEnPassantTargetSquare(MoveCommand cmd);
+
+	bool withinBoard(int position10x12);
+	char pieceColor(int position10x12);
+
+	void moveGenerator(int position10x12, vector<MoveCommand*>* legalCommands);
 
 public:
 	char field[120];
