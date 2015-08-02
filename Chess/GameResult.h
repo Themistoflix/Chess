@@ -10,6 +10,7 @@ public:
 	GameResult();
 
 public:
+	enum reasonCodes {matt = 0, patt, zeitüberschreitung, unzulässiger_Zug, remis_durch_Zuglimit};
 	string nameBlack;
 	string nameWhite;
 

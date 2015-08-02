@@ -11,3 +11,12 @@ MoveCommand::MoveCommand(int from, int to, char promo){
 	toPosition8x8 = to;
 	promotionCode = promo;
 }
+
+bool MoveCommand::operator==(MoveCommand& cmd){
+	if (fromPosition8x8 == cmd.fromPosition8x8 && toPosition8x8 == cmd.toPosition8x8){
+		if (promotionCode == cmd.promotionCode || promotionCode == '*' || cmd.promotionCode == '*'){
+			return true;
+		}
+	}
+	return false;
+}

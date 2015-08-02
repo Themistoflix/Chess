@@ -19,8 +19,12 @@ public:
 	Board to8x8Board();
 	void setupStartPosition();
 
+	Move constructMove(MoveCommand cmd);
 	void makeMove(Move move);
 	void unmakeMove(Move move);
+
+	bool isWKingAttacked(); //TODO Muss noch implementiert werden
+	bool isBKingAttacked();
 
 	void updateCastlingRightsAfterMove(Move move);
 	void updateMoveRight();
@@ -33,6 +37,11 @@ public:
 
 public:
 	char field[120];
+	enum pieceList { whitePawn = 'B', whiteRook = 'T', whiteKnight = 'H', whiteBishop = 'L', 
+		whiteQueen = 'D', whiteKing = 'K',
+		blackPawn = 'b', blackRook = 't', blackKnight = 'h', blackBishop = 'l', 
+		blackQueen = 'd', blackKing = 'k', 
+		empty = '.' };
 
 	int kingWPosition10x12;
 	int kingBPosition10x12;

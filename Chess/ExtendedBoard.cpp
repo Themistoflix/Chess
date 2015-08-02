@@ -100,13 +100,93 @@ Board ExtendedBoard::to8x8Board(){
 	return b;
 }
 
+Move ExtendedBoard::constructMove(MoveCommand cmd){
+	Move move;
+
+	int fromPosition10x12 = mailboxTo120(cmd.fromPosition8x8);
+	int toPosition10x12 = mailboxTo120(cmd.toPosition8x8);
+
+	move.positionsAndDeltas[0] = fromPosition10x12;
+	move.positionsAndDeltas[1] = empty - field[fromPosition10x12];
+	move.positionsAndDeltas[2] = toPosition10x12;
+	move.positionsAndDeltas[3] = field[fromPosition10x12] - field[toPosition10x12];
+
+	move.castlingRigths[0] = longCastlingWAllowed;
+	move.castlingRigths[1] = shortCastlingWAllowed;
+	move.castlingRigths[2] = longCastlingBAllowed;
+	move.castlingRigths[3] = shortCastlingBAllowed;
+	
+	
+	char movedPiece = field[fromPosition10x12];
+
+	switch (movedPiece){
+	case whitePawn:
+		const int offsetFieldBelow = 10;
+		if (toPosition10x12 == enPassantTargetSquare10x12){
+			move.positionsAndDeltas[4] = toPosition10x12 + offsetFieldBelow;
+			move.positionsAndDeltas[5] = empty - field[toPosition10x12 + offsetFieldBelow];
+		}
+		break;
+
+	case blackPawn:
+		const int offsetFieldAbove = -10;
+		if (toPosition10x12 == enPassantTargetSquare10x12){
+			move.positionsAndDeltas[4] = toPosition10x12 + offsetFieldAbove;
+			move.positionsAndDeltas[5] = empty - field[toPosition10x12 + offsetFieldAbove];
+		}
+		break;
+
+	case whiteKing || blackKing:
+		const int offset1FieldLeft = -1;
+		const int offset1FieldRight = 1;
+
+		const int offset2FieldsLeft = -2;
+		const int offset2FieldsRight = 2;
+
+		const int offset3FieldsRight = 3;
+		
+		const int offset4FieldsLeft = -4;
+		
+		//lange Rochade
+		if (toPosition10x12 - fromPosition10x12 == offset2FieldsLeft){
+			move.positionsAndDeltas[4] = fromPosition10x12 + offset4FieldsLeft;
+			move.positionsAndDeltas[5] = empty - field[fromPosition10x12 + offset4FieldsLeft];
+
+			move.positionsAndDeltas[6] = fromPosition10x12 + offset1FieldLeft;
+			move.positionsAndDeltas[7] = field[fromPosition10x12 + offset4FieldsLeft] - empty;
+		}//kurze Rochade
+		else if (toPosition10x12 - fromPosition10x12 == offset2FieldsRight){
+			move.positionsAndDeltas[4] = fromPosition10x12 + offset3FieldsRight;
+			move.positionsAndDeltas[5] = empty - field[fromPosition10x12 + offset3FieldsRight];
+
+			move.positionsAndDeltas[6] = fromPosition10x12 + offset1FieldRight;
+			move.positionsAndDeltas[7] = field[fromPosition10x12 + offset3FieldsRight] - empty;
+		}
+
+		if (pieceColor(fromPosition10x12) == 'w'){
+			move.castlingRigths[0] = false;
+			move.castlingRigths[1] = false;
+
+			move.kingWPosition10x12Delta = toPosition10x12 - kingWPosition10x12;
+		}
+		else{
+			move.castlingRigths[2] = false;
+			move.castlingRigths[3] = false;
+
+			move.kingBPosition10x12Delta = toPosition10x12 - kingBPosition10x12;
+		}
+	}
+
+	return move;
+}
+
 void ExtendedBoard::makeMove(Move move){
 	for (int i = 0; i < 4; i++){
 		field[move.positionsAndDeltas[i * 2]] += move.positionsAndDeltas[i * 2 + 1];
 	}
 
-	kingWPosition10x12 += move.KingWPosition10x12Delta;
-	kingBPosition10x12 += move.KingBPosition10x12Delta;
+	kingWPosition10x12 += move.kingWPosition10x12Delta;
+	kingBPosition10x12 += move.kingBPosition10x12Delta;
 }
 
 void ExtendedBoard::unmakeMove(Move move){
@@ -114,16 +194,16 @@ void ExtendedBoard::unmakeMove(Move move){
 		field[move.positionsAndDeltas[i * 2]] -= move.positionsAndDeltas[i * 2 + 1];
 	}
 
-	kingWPosition10x12 -= move.KingWPosition10x12Delta;
-	kingBPosition10x12 -= move.KingBPosition10x12Delta;
+	kingWPosition10x12 -= move.kingWPosition10x12Delta;
+	kingBPosition10x12 -= move.kingBPosition10x12Delta;
 }
 
 void ExtendedBoard::updateCastlingRightsAfterMove(Move move){
-	longCastlingWAllowed = (longCastlingWAllowed && move.castlingNowForbidden[0]);
-	shortCastlingWAllowed = (shortCastlingWAllowed && move.castlingNowForbidden[1]);
+	longCastlingWAllowed = move.castlingRigths[0];
+	shortCastlingWAllowed = move.castlingRigths[1];
 
-	longCastlingBAllowed = (longCastlingBAllowed && move.castlingNowForbidden[2]);
-	shortCastlingBAllowed = (shortCastlingBAllowed && move.castlingNowForbidden[3]);
+	longCastlingBAllowed = move.castlingRigths[2];
+	shortCastlingBAllowed = move.castlingRigths[3];
 }
 
 void ExtendedBoard::updateMoveRight(){

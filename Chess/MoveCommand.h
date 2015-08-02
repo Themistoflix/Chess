@@ -8,5 +8,7 @@ struct MoveCommand{
 	int fromPosition8x8;
 	int toPosition8x8;
 	char promotionCode;
+
+	bool operator==(MoveCommand& cmd);
 };
 #endif _MOVECOMMAND_H_

@@ -17,6 +17,9 @@ public:
 	Referee();
 
 	GameResult verifyMove(MoveCommand cmd);
+	GameResult checkCommand(MoveCommand cmd);
+	GameResult applyMoveAndTestCheck(Move move);
+
 	Board returnActualizedBoard();
 
 	void reset();
