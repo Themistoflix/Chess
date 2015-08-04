@@ -23,20 +23,26 @@ public:
 	void makeMove(Move move);
 	void unmakeMove(Move move);
 
+	bool isFieldAttackedBy(int side, int position10x12);
 	bool isWKingAttacked(); //TODO Muss noch implementiert werden
 	bool isBKingAttacked();
+	
 
 	void updateCastlingRightsAfterMove(Move move);
 	void updateMoveRight();
 	void updateEnPassantTargetSquare(MoveCommand cmd);
 
 	bool withinBoard(int position10x12);
-	char pieceColor(int position10x12);
+	bool isEmpty(int position10x12);
+	int pieceSide(int position10x12);
+	int pieceKind(int position10x12);
 
-	void moveGenerator(int position10x12, vector<MoveCommand*>* legalCommands);
+	void moveGenerator(int position10x12, vector<MoveCommand*>* pseudoLegalCommands);
 
 public:
 	char field[120];
+	enum sides {white = 0, black, neutral};
+	enum kinds { king = 0, queen, bishop, knight, rook, pawn, empty };
 	enum pieceList { whitePawn = 'B', whiteRook = 'T', whiteKnight = 'H', whiteBishop = 'L', 
 		whiteQueen = 'D', whiteKing = 'K',
 		blackPawn = 'b', blackRook = 't', blackKnight = 'h', blackBishop = 'l', 

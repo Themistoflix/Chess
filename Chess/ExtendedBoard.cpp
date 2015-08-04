@@ -136,6 +136,22 @@ Move ExtendedBoard::constructMove(MoveCommand cmd){
 		}
 		break;
 
+	case blackRook:
+		if (fromPosition10x12 > kingBPosition10x12){
+			move.castlingRigths[3] = false;
+		}
+		else{
+			move.castlingRigths[2] = false;
+		}
+		break;
+
+	case whiteRook:
+		if (fromPosition10x12 > kingWPosition10x12){
+			move.castlingRigths[1] = false;
+		}
+		else{
+			move.castlingRigths[0] = false;
+		}
 	case whiteKing || blackKing:
 		const int offset1FieldLeft = -1;
 		const int offset1FieldRight = 1;
@@ -163,7 +179,7 @@ Move ExtendedBoard::constructMove(MoveCommand cmd){
 			move.positionsAndDeltas[7] = field[fromPosition10x12 + offset3FieldsRight] - empty;
 		}
 
-		if (pieceColor(fromPosition10x12) == 'w'){
+		if (pieceSide(fromPosition10x12) == white){
 			move.castlingRigths[0] = false;
 			move.castlingRigths[1] = false;
 
@@ -236,19 +252,61 @@ bool ExtendedBoard::withinBoard(int position10x12){
 	return false;
 }
 
-char ExtendedBoard::pieceColor(int position10x12){
-	if (field[position10x12] == '.'){
-		return 'n';
-	}
-	else if (field[position10x12] >= 97){
-		return 'b';
+bool ExtendedBoard::isEmpty(int position10x12){
+	if (field[position10x12] == pieceList::empty){
+		return true;
 	}
 	else{
-		return 'w';
+		return false;
 	}
 }
 
-void ExtendedBoard::moveGenerator(int position10x12, vector<MoveCommand*>* legalCommands){
+int ExtendedBoard::pieceSide(int position10x12){
+	if (field[position10x12] == pieceList::empty){
+		return neutral;
+	}
+	else if (field[position10x12] == pieceList::blackKing ||
+		field[position10x12] == pieceList::blackQueen ||
+		field[position10x12] == pieceList::blackRook ||
+		field[position10x12] == pieceList::blackBishop ||
+		field[position10x12] == pieceList::blackKnight ||
+		field[position10x12] == pieceList::blackPawn){
+		return black;
+	}
+	else{
+		return white;
+	}
+}
+
+int ExtendedBoard::pieceKind(int position10x12){
+	int currentKind = -1;
+
+	if (field[position10x12] == blackKing || field[position10x12] == whiteKing){
+		currentKind = king;
+	}
+	else if (field[position10x12] == blackQueen || field[position10x12] == whiteQueen){
+		currentKind = queen;
+	}
+	else if (field[position10x12] == blackBishop || field[position10x12] == whiteBishop){
+		currentKind = bishop;
+	}
+	else if (field[position10x12] == blackKnight || field[position10x12] == whiteKnight){
+		currentKind = knight;
+	}
+	else if (field[position10x12] == blackRook || field[position10x12] == whiteRook){
+		currentKind = rook;
+	}
+	else if (field[position10x12] == blackPawn || field[position10x12] == whitePawn){
+		currentKind = pawn;
+	}
+	else{
+		currentKind = kinds::empty;
+	}
+
+	return currentKind;
+}
+  
+void ExtendedBoard::moveGenerator(int position10x12, vector<MoveCommand*>* pseudoLegalCommands){
 	int queenOffsets[] = { 1, 11, 10, 9, -1, -11, -10, -9 };
 	int kingOffsets[] = { 1, 11, 10, 9, -1, -11, -10, -9 };
 	int bishopOffsets[] = { 11, 9, -11, -9};
@@ -258,29 +316,15 @@ void ExtendedBoard::moveGenerator(int position10x12, vector<MoveCommand*>* legal
 	int blackPawnOffsets[] = { 9, 10, 11, 20 };
 	int whitePawnOffsets[] = { -11, -10, -9, -20 };
 
-	enum kinds { king = 0, queen, bishop, knight, rook, blackPawn, whitePawn };
-	int currentKind = -1;
-
-	if (field[position10x12] == 'k' || field[position10x12] == 'K'){
-		currentKind = king;
-	}
-	else if (field[position10x12] == 'd' || field[position10x12] == 'D'){
-		currentKind = queen;
-	}
-	else if (field[position10x12] == 'l' || field[position10x12] == 'L'){
-		currentKind = bishop;
-	}
-	else if (field[position10x12] == 's' || field[position10x12] == 'S'){
-		currentKind = knight;
-	}
-	else if (field[position10x12] == 't' || field[position10x12] == 'T'){
-		currentKind = rook;
-	}
-	else if (field[position10x12] == 'b'){
-		currentKind = blackPawn;
-	}
-	else if (field[position10x12] == 'B'){
-		currentKind = whitePawn;
+	
+	int currentKind = pieceKind(position10x12);
+	if (currentKind = pawn){
+		if (field[position10x12] == blackPawn){
+			currentKind = blackPawn;
+		}
+		else{
+			currentKind = whitePawn;
+		}
 	}
 
 	int newPosition10x12;
@@ -290,90 +334,106 @@ void ExtendedBoard::moveGenerator(int position10x12, vector<MoveCommand*>* legal
 	case king: 
 		for (int i = 0; i < 8; i++){
 			newPosition10x12 = position10x12 + kingOffsets[i];
-			if (!withinBoard(newPosition10x12) || field[newPosition10x12]){
-				break;
+			if (!withinBoard(newPosition10x12) || pieceSide(newPosition10x12) == pieceSide(position10x12)){
+				continue;
 			}
 			cmd = new MoveCommand(position10x12, newPosition10x12, ' ');
-			legalCommands->push_back(cmd);
+			pseudoLegalCommands->push_back(cmd);
 		}
 
 		int freeFieldsToLeft = 1;
-		while (withinBoard(position10x12 - freeFieldsToLeft) && field[position10x12 - freeFieldsToLeft] == '.'){
+		while (withinBoard(position10x12 - freeFieldsToLeft) && isEmpty(position10x12 - freeFieldsToLeft)){
 			freeFieldsToLeft++;
 		}
 		if (freeFieldsToLeft == 4){
-			if (field[position10x12] == 'k' && longCastlingBAllowed){
+			if (field[position10x12] == blackKing && longCastlingBAllowed){
 				cmd = new MoveCommand(position10x12, position10x12 - 2, ' ');
-				legalCommands->push_back(cmd);
+				pseudoLegalCommands->push_back(cmd);
 			}
-			else if (field[position10x12] == 'K' && longCastlingWAllowed){
+			else if (field[position10x12] == whiteKing && longCastlingWAllowed){
 				cmd = new MoveCommand(position10x12, position10x12 - 2, ' ');
-				legalCommands->push_back(cmd);
+				pseudoLegalCommands->push_back(cmd);
 			}
 		}
 
 		int freeFieldsToRight = 1;
-		while (withinBoard(position10x12 + freeFieldsToRight) && field[position10x12 + freeFieldsToRight] == '.'){
+		while (withinBoard(position10x12 + freeFieldsToRight) && isEmpty(position10x12 + freeFieldsToRight)){
 			freeFieldsToRight++;
 		}
 		if (freeFieldsToRight == 3){
-			if (field[position10x12] == 'k' && shortCastlingBAllowed){
+			if (field[position10x12] == blackKing && shortCastlingBAllowed){
 				cmd = new MoveCommand(position10x12, position10x12 + 2, ' ');
-				legalCommands->push_back(cmd);
+				pseudoLegalCommands->push_back(cmd);
 			}
-			else if (field[position10x12] == 'K' && shortCastlingWAllowed){
+			else if (field[position10x12] == whiteKing && shortCastlingWAllowed){
 				cmd = new MoveCommand(position10x12, position10x12 - 2, ' ');
-				legalCommands->push_back(cmd);
+				pseudoLegalCommands->push_back(cmd);
 			}
 		}
 
 		break;
+
 	case queen:
 		for (int i = 0; i < 8; i++){
 			for (int j = 1;; j++){
 				newPosition10x12 = position10x12 + j*queenOffsets[i];
-				if (!withinBoard(newPosition10x12) || field[newPosition10x12] != '.'){
+				if (!withinBoard(newPosition10x12) || pieceSide(newPosition10x12) == pieceSide(position10x12)){
 					break;
 				}
 				cmd = new MoveCommand(position10x12, newPosition10x12, ' ');
-				legalCommands->push_back(cmd);
+				pseudoLegalCommands->push_back(cmd);
+
+				if (!isEmpty(newPosition10x12)){
+					break;
+				}
 			}
 		}
 		break;
+
 	case bishop:
 		for (int i = 0; i < 4; i++){
 			for (int j = 1;; j++){
 				newPosition10x12 = position10x12 + j*bishopOffsets[i];
-				if (!withinBoard(newPosition10x12) || field[newPosition10x12] != '.'){
+				if (!withinBoard(newPosition10x12) || pieceSide(newPosition10x12) == pieceSide(position10x12)){
 					break;
 				}
 				cmd = new MoveCommand(position10x12, newPosition10x12, ' ');
-				legalCommands->push_back(cmd);
+				pseudoLegalCommands->push_back(cmd);
+
+				if (!isEmpty(newPosition10x12)){
+					break;
+				}
 			}
 		}
 		break;
+
 	case knight:
 		for (int i = 0; i < 8; i++){
 			newPosition10x12 = position10x12 + knightOffsets[i];
-			if (!withinBoard(newPosition10x12)){
+			if (!withinBoard(newPosition10x12) || pieceSide(newPosition10x12) == pieceSide(position10x12)){
 				continue;
 			}
 			cmd = new MoveCommand(position10x12, newPosition10x12, ' ');
-			legalCommands->push_back(cmd);
+			pseudoLegalCommands->push_back(cmd);
 		}
 		break;
+
 	case rook:
 		for (int i = 0; i < 4; i++){
 			for (int j = 0;; j++){
 				newPosition10x12 = position10x12 + j*rookOffsets[i];
-				if (!withinBoard(newPosition10x12) || field[newPosition10x12] != '.'){
+				if (!withinBoard(newPosition10x12) || pieceSide(newPosition10x12) == pieceSide(position10x12)){
 					break;
 				}
 				cmd = new MoveCommand(position10x12, newPosition10x12, ' ');
-				legalCommands->push_back(cmd);
+				pseudoLegalCommands->push_back(cmd);
+				if (!isEmpty(newPosition10x12)){
+					break;
+				}
 			}
 		}
 		break;
+
 	case blackPawn:
 		char promo = ' ';
 		for (int i = 0; i < 4; i++){
@@ -387,20 +447,21 @@ void ExtendedBoard::moveGenerator(int position10x12, vector<MoveCommand*>* legal
 				promo = '*';
 			}
 
-			if ((i == 0 || i == 2) && (pieceColor(newPosition10x12) == 'w' || newPosition10x12 == enPassantTargetSquare10x12)){
+			if ((i == 0 || i == 2) && (pieceSide(newPosition10x12) == white || newPosition10x12 == enPassantTargetSquare10x12)){
 				cmd = new MoveCommand(position10x12, newPosition10x12, promo);
-				legalCommands->push_back(cmd);
+				pseudoLegalCommands->push_back(cmd);
 			}
-			else if (i == 1 && field[newPosition10x12] == '.'){
+			else if (i == 1 && isEmpty(newPosition10x12)){
 				cmd = new MoveCommand(position10x12, newPosition10x12, promo);
-				legalCommands->push_back(cmd);
+				pseudoLegalCommands->push_back(cmd);
 			}
-			else if (i == 3 && position10x12 / 10 == 4 && field[position10x12 + 10] == '.' && field[newPosition10x12] == '.'){
+			else if (i == 3 && position10x12 / 10 == 3 && isEmpty(position10x12 + 10) && isEmpty(newPosition10x12)){
 				cmd = new MoveCommand(position10x12, newPosition10x12, promo);
-				legalCommands->push_back(cmd);
+				pseudoLegalCommands->push_back(cmd);
 			}
 		}
 		break;
+
 	case whitePawn:
 		char promo = ' ';
 		for (int i = 0; i < 4; i++){
@@ -413,17 +474,17 @@ void ExtendedBoard::moveGenerator(int position10x12, vector<MoveCommand*>* legal
 				promo = '*';
 			}
 
-			if ((i == 0 || i == 2) && (pieceColor(newPosition10x12) == 'b' || newPosition10x12 == enPassantTargetSquare10x12)){
+			if ((i == 0 || i == 2) && (pieceSide(newPosition10x12) == black || newPosition10x12 == enPassantTargetSquare10x12)){
 				cmd = new MoveCommand(position10x12, newPosition10x12, promo);
-				legalCommands->push_back(cmd);
+				pseudoLegalCommands->push_back(cmd);
 			}
-			else if (i == 1 && field[newPosition10x12] == '.'){
+			else if (i == 1 && isEmpty(newPosition10x12)){
 				cmd = new MoveCommand(position10x12, newPosition10x12, promo);
-				legalCommands->push_back(cmd);
+				pseudoLegalCommands->push_back(cmd);
 			}
-			else if (i == 3 && position10x12 / 10 == 7 && field[position10x12 - 10] == '.' && field[newPosition10x12] == '.'){
+			else if (i == 3 && position10x12 / 10 == 8 && isEmpty(position10x12 - 10) && isEmpty(newPosition10x12)){
 				cmd = new MoveCommand(position10x12, newPosition10x12, promo);
-				legalCommands->push_back(cmd);
+				pseudoLegalCommands->push_back(cmd);
 			}
 		}
 		break;
